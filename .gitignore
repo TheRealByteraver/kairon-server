@@ -1,0 +1,32 @@
+# Python
+*.pyc
+__pycache__/
+venv/
+.env
+
+# Reference file
+app_original.py
+
+# Flask
+instance/
+webapp.egg-info/
+webapp/__pycache__/
+webapp/*.pyc
+
+# Marshmallow
+.mypy_cache/
+.marshmallow
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# Dependency management
+# pipfile.lock # https://github.com/pypa/pipenv/issues/2657
