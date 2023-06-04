@@ -36,19 +36,21 @@ ma = Marshmallow(app)
 class Token(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(100), unique=True, nullable=False)
-    archived = db.Column(db.Boolean, default=False, nullable=True)
+    active = db.Column(db.Boolean, default=True, nullable=True)
 
     # 'self' is the equivalent of 'this' in javascript
     # __init__ is the class constructor
-    def __init__(self, token, archived):
+    def __init__(self, token, active):
         self.token = token
-        self.archived = archived
+        self.active = active
 
 # Product Schema
 class TokenSchema(ma.Schema):
     # fields that we are allowed to show
     class Meta:
-        fields = ('id', 'token', 'archived')
+        model = Token
+        # TODO: check how we can define 'archived' as optional
+        fields = ('id', 'token', 'active')
         
 # Init Schema
 token_schema = TokenSchema()
@@ -64,8 +66,8 @@ def get():
 @cross_origin()
 def add_token():
     token = request.json['token']
-    archived = request.json['archived']
-    new_token = Token(token, archived)
+    active = request.json['active']
+    new_token = Token(token, active)
     db.session.add(new_token)
     db.session.commit()
     return token_schema.jsonify(new_token)
@@ -91,7 +93,7 @@ def get_token(id):
 def update_token(id):
     token = Token.query.get(id)
     # token.token = request.json['token']
-    token.archived = request.json['archived']
+    token.active = request.json['active']
     db.session.commit()
     return token_schema.jsonify(token)
 
