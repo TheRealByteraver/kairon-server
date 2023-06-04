@@ -1,5 +1,5 @@
 # https://www.youtube.com/watch?v=PTZiDnuC86g&ab_channel=TraversyMedia
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS, cross_origin, logging
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -34,14 +34,13 @@ ma = Marshmallow(app)
 
 # Product Class/Model: always create a class for each db model
 class Token(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    token = db.Column(db.String(100), unique=True, nullable=False)
-    active = db.Column(db.Boolean, default=True, nullable=True)
+    id = db.Column(db.String(100), primary_key=True)
+    active = db.Column(db.Boolean, default=True)
 
     # 'self' is the equivalent of 'this' in javascript
     # __init__ is the class constructor
     def __init__(self, token, active):
-        self.token = token
+        self.id = token
         self.active = active
 
 # Product Schema
@@ -49,8 +48,7 @@ class TokenSchema(ma.Schema):
     # fields that we are allowed to show
     class Meta:
         model = Token
-        # TODO: check how we can define 'archived' as optional
-        fields = ('id', 'token', 'active')
+        fields = ('id', 'active')
         
 # Init Schema
 token_schema = TokenSchema()
@@ -59,18 +57,21 @@ tokens_schema = TokenSchema(many=True)
 @app.route('/', methods=['GET'])
 @cross_origin()
 def get():
-    return jsonify({'msg': 'Hello world :)'})
+    return render_template('welcome.html')
 
 # Create a token
 @app.route('/token', methods=['POST'])
 @cross_origin()
 def add_token():
-    token = request.json['token']
-    active = request.json['active']
-    new_token = Token(token, active)
-    db.session.add(new_token)
-    db.session.commit()
-    return token_schema.jsonify(new_token)
+    id = request.json['id']
+    active = True
+    new_token = Token(id, active)
+    try:
+        db.session.add(new_token)
+        db.session.commit()
+        return token_schema.jsonify(new_token)
+    except:
+        return jsonify({ "error": "unable to add token '" + id + "', make sure you don't try to add the token twice."})
 
 # Get all tokens
 @app.route('/token', methods=['GET'])
@@ -85,27 +86,35 @@ def get_tokens():
 @cross_origin()
 def get_token(id):
     token = Token.query.get(id)
-    return token_schema.jsonify(token)
+    if(token):
+        return token_schema.jsonify(token)
+    else:
+        return jsonify({ "error": "could not find token '" + id + "'"})
 
 # Update a single token
 @app.route('/token/<id>', methods=['PUT'])
 @cross_origin()
 def update_token(id):
     token = Token.query.get(id)
-    # token.token = request.json['token']
-    token.active = request.json['active']
-    db.session.commit()
-    return token_schema.jsonify(token)
+    if(token):
+        token.active = request.json['active']
+        db.session.commit()
+        return token_schema.jsonify(token)
+    else:
+        return jsonify({ "error": "could not find token '" + id + "'"})
 
 # Delete a single token
 @app.route('/token/<id>', methods=['DELETE'])
 @cross_origin()
 def delete_token(id):
     token = Token.query.get(id)
-    db.session.delete(token)
-    db.session.commit()
-    return token_schema.jsonify(token)
-
+    if(token):
+        db.session.delete(token)
+        db.session.commit()
+        return token_schema.jsonify(token)
+    else:
+        return jsonify({ "error": "could not find token '" + id + "'"})
+    
 # Run server
 if __name__ == '__main__':
     app.run(debug=True)

@@ -6,6 +6,7 @@ venv/
 
 # Reference file
 app_original.py
+app_example.py
 
 # Flask
 instance/

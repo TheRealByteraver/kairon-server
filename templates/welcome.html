@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to the API for the CoinGecko interface</title>
+  </head>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+  </style>
+  <body>
+    <h1>Welcome to the API.</h1>
+    <p>Available endpoint(s): /token, /token/:token_name</p>
+    <h2>Available request methods for /token:</h2>
+    <ul>
+      <li>
+        <p>
+          GET: get all tokens<br />
+          returns: an array of token objects
+        </p>
+      </li>
+      <li>
+        <p>
+          POST: add a new token. e.g. for body: { "id": "bitcoin" }<br />
+          returns: created token object on success, error object on error
+        </p>
+      </li>      
+    </ul>
+    <h2>Available request methods for /token/:token_name:</h2>
+    <ul>
+      <li>
+        <p>
+          GET: get a specific token, e.g. /token/bitcoin<br>
+          returns: a token object on success, error object on error
+        </p>
+      </li>
+      <li>
+        <p>
+          PUT: update a specific token. e. g. /token/ethereum with body { "active": 1 }<br>
+          returns: the updated token object on success, error object on error
+        </p>
+      </li>
+      <li>
+        <p>
+          DELETE: (hard) delete a specific token. e. g. /token/ethereum<br>
+          returns: the deleted token object on success, error object on error
+        </p>
+      </li>
+    </ul>
+
+    <!-- Available request methods for /token:
+          GET: get all tokens
+              returns: an array of token objects
+
+          POST: add a new token. e.g. for body: { "id": "bitcoin" }
+              returns: created token object on success, error object on error
+          
+      Available request methods for /token/:token_name:
+          GET: get a specific token, e.g. /token/bitcoin
+              returns: a token object on success, error object on error
+
+          PUT: update a specific token. e. g. /token/ethereum with body { "active": 1 }
+              returns: the updated token object on success, error object on error
+          
+          DELETE: (hard) delete a specific token. e. g. /token/ethereum
+              returns: the deleted token object on success, error object on error  
+ -->
+  </body>
+</html>
