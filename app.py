@@ -1,3 +1,14 @@
+# endpoint om alle inactive tokens te verkrijgen met url param "inactive" (GET request)
+
+# update documentatie
+
+# OK alle endpoints op "tokens" ipv "token"
+# OK PATCH ipv PUT
+# OK geen hard delete
+# OK soft delete afgehandeld door db
+# OK aparte primary key per row
+
+
 # https://www.youtube.com/watch?v=PTZiDnuC86g&ab_channel=TraversyMedia
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS, cross_origin, logging
@@ -34,13 +45,14 @@ ma = Marshmallow(app)
 
 # Product Class/Model: always create a class for each db model
 class Token(db.Model):
-    id = db.Column(db.String(100), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
     active = db.Column(db.Boolean, default=True)
 
     # 'self' is the equivalent of 'this' in javascript
     # __init__ is the class constructor
     def __init__(self, token, active):
-        self.id = token
+        self.name = token
         self.active = active
 
 # Product Schema
@@ -48,11 +60,15 @@ class TokenSchema(ma.Schema):
     # fields that we are allowed to show
     class Meta:
         model = Token
-        fields = ('id', 'active')
+        fields = ('id', 'name', 'active')
         
 # Init Schema
 token_schema = TokenSchema()
 tokens_schema = TokenSchema(many=True)
+
+# -----------------------------------------------------------------------------
+# ------------------------------- ### Routes ### ------------------------------
+# -----------------------------------------------------------------------------
 
 @app.route('/', methods=['GET'])
 @cross_origin()
@@ -60,39 +76,57 @@ def get():
     return render_template('welcome.html')
 
 # Create a token
-@app.route('/token', methods=['POST'])
+@app.route('/tokens', methods=['POST'])
 @cross_origin()
 def add_token():
-    id = request.json['id']
+    name = request.json['name']
     active = True
-    new_token = Token(id, active)
+    new_token = Token(name, active)
     try:
         db.session.add(new_token)
         db.session.commit()
         return token_schema.jsonify(new_token)
     except:
-        return jsonify({ "error": "unable to add token '" + id + "', make sure you don't try to add the token twice."})
+        try:
+            # check if the token already exist as an inactive token.
+            # if so, reactivate it
+            db.session.rollback() # this is necessary because of the previous exception
+            inactive_token = Token.query.filter(Token.name == name).first()
+            inactive_token.active = True
+            db.session.commit()
+            return token_schema.jsonify(inactive_token)
+        except Exception as e:
+            print("exception on reactivating token:", e)
+            return jsonify({"error": "unable to add/reactivate token '" + name + "', make sure you don't try to add the token twice."})
 
 # Get all tokens
-@app.route('/token', methods=['GET'])
+@app.route('/tokens', methods=['GET'])
 @cross_origin()
 def get_tokens():
-    all_tokens = Token.query.all()
-    result = tokens_schema.dump(all_tokens)
+    query = request.args.get('query')
+    if query == "inactive":
+        active_tokens = Token.query.filter(Token.active == 0).all()
+    else:
+        active_tokens = Token.query.filter(Token.active == 1).all()
+
+    # print("active_tokens")
+    # print(active_tokens)
+
+    result = tokens_schema.dump(active_tokens)
     return jsonify(result)
 
 # Get a single token
-@app.route('/token/<id>', methods=['GET'])
+@app.route('/tokens/<id>', methods=['GET'])
 @cross_origin()
 def get_token(id):
     token = Token.query.get(id)
     if(token):
         return token_schema.jsonify(token)
     else:
-        return jsonify({ "error": "could not find token '" + id + "'"})
+        return jsonify({ "error": "could not find token with id " + id})
 
 # Update a single token
-@app.route('/token/<id>', methods=['PUT'])
+@app.route('/tokens/<id>', methods=['PATCH'])
 @cross_origin()
 def update_token(id):
     token = Token.query.get(id)
@@ -101,20 +135,8 @@ def update_token(id):
         db.session.commit()
         return token_schema.jsonify(token)
     else:
-        return jsonify({ "error": "could not find token '" + id + "'"})
+        return jsonify({ "error": "could not find token with id" + id})
 
-# Delete a single token
-@app.route('/token/<id>', methods=['DELETE'])
-@cross_origin()
-def delete_token(id):
-    token = Token.query.get(id)
-    if(token):
-        db.session.delete(token)
-        db.session.commit()
-        return token_schema.jsonify(token)
-    else:
-        return jsonify({ "error": "could not find token '" + id + "'"})
-    
 # Run server
 if __name__ == '__main__':
     app.run(debug=True)

@@ -9,44 +9,41 @@
   <style>
     body {
       font-family: sans-serif;
+      color: #555;
     }
   </style>
   <body>
     <h1>Welcome to the API.</h1>
-    <p>Available endpoint(s): /token, /token/:token_name</p>
-    <h2>Available request methods for /token:</h2>
+    <p>Available endpoint(s): /tokens, /tokens/:id where <em>id</em> is the primary key.</p>
+    <h2>Available request methods for /tokens</h2>
     <ul>
       <li>
         <p>
           GET: get all tokens<br />
+          parameters: <strong>?query=active</strong> (default) and <strong>?query=inactive</strong><br>
           returns: an array of token objects
         </p>
       </li>
       <li>
         <p>
-          POST: add a new token. e.g. for body: { "id": "bitcoin" }<br />
-          returns: created token object on success, error object on error
+          POST: add a new token. e.g. for body: { "name": "bitcoin" }<br />
+          returns: created token object on success, error object on error.<br>
+          <strong>Note:</strong> trying to create an existing but inactive token will simply reactivate that token.
         </p>
       </li>      
     </ul>
-    <h2>Available request methods for /token/:token_name:</h2>
+    <h2>Available request methods for /tokens/:id</h2>
     <ul>
       <li>
         <p>
-          GET: get a specific token, e.g. /token/bitcoin<br>
+          GET: get a specific token, e.g. /tokens/1<br>
           returns: a token object on success, error object on error
         </p>
       </li>
       <li>
         <p>
-          PUT: update a specific token. e. g. /token/ethereum with body { "active": 1 }<br>
+          PATCH: update a specific token. e. g. /tokens/2 with body { "active": 1 }<br>
           returns: the updated token object on success, error object on error
-        </p>
-      </li>
-      <li>
-        <p>
-          DELETE: (hard) delete a specific token. e. g. /token/ethereum<br>
-          returns: the deleted token object on success, error object on error
         </p>
       </li>
     </ul>
