@@ -1,0 +1,138 @@
+{
+	"info": {
+		"_postman_id": "41062e2a-d666-4120-ab23-112c0ef44342",
+		"name": "Kairon Labs Assignment - Python API v2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13424237",
+		"_collection_link": "https://lively-star-583983.postman.co/workspace/Project-9---Rest-API~62672559-cf8d-43e8-819a-81dfae167715/collection/13424237-41062e2a-d666-4120-ab23-112c0ef44342?action=share&creator=13424237&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "GET /tokens?query=active - Get active tokens",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/tokens?query=active",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"tokens"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "active"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /tokens?query=inactive - Get inactive tokens",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/tokens?query=inactive",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"tokens"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "inactive"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /tokens",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"tether\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/tokens",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH /tokens/:id - update a single token",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"active\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/tokens/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"tokens",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /tokens/:id - Get a single token",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/tokens/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"tokens",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

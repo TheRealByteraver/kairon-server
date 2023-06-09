@@ -1,15 +1,3 @@
-# endpoint om alle inactive tokens te verkrijgen met url param "inactive" (GET request)
-
-# update documentatie
-
-# OK alle endpoints op "tokens" ipv "token"
-# OK PATCH ipv PUT
-# OK geen hard delete
-# OK soft delete afgehandeld door db
-# OK aparte primary key per row
-
-
-# https://www.youtube.com/watch?v=PTZiDnuC86g&ab_channel=TraversyMedia
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS, cross_origin, logging
 from flask_sqlalchemy import SQLAlchemy
@@ -108,10 +96,6 @@ def get_tokens():
         active_tokens = Token.query.filter(Token.active == 0).all()
     else:
         active_tokens = Token.query.filter(Token.active == 1).all()
-
-    # print("active_tokens")
-    # print(active_tokens)
-
     result = tokens_schema.dump(active_tokens)
     return jsonify(result)
 
